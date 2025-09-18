@@ -25,30 +25,24 @@ cd ci3-starter-php84
 
 2.  **Install dependencies**
 
-Jika menggunakan Composer untuk `.env`:
+Install composer
 
-`composer install`
+```
+composer install
+```
 
 3.  **Konfigurasi `.env`**
 
-Buat file `.env` di root project:
+Copy file `.env-example` menjadi `.env` di root project dan sesuaikan isinya dengan konfigurasi Anda
 
-```
-APP_NAME=CI3 Starter
-APP_ENV=development
-APP_DEBUG=true
+4.	**Konfigurasi `.htaccess`**
+Copy file `.htaccess-example` menjadi `.htaccess` di root project
 
-DB_HOST=localhost
-DB_USER=root
-DB_PASS=password
-DB_NAME=ci3_starter
-```
-
-4.  **Import database**
+5.  **Import database**
 
 Import file SQL di folder /database -> `ci3_starter.sql` ke MySQL:
 
-5.  **Jalankan project**
+6.  **Jalankan project**
 
 Buka browser contoh:
 
@@ -56,14 +50,14 @@ Buka browser contoh:
 http://localhost/ci3-starter-php84/
 ```
 
-6. **Akses Login Admin**
+7. **Akses Login Admin**
 
 ```
 Username : admin
 Password : admin123
 ```
 
-Lisensi
+## Lisensi
 -------
 
 MIT License. Bebas digunakan dan dikembangkan.
