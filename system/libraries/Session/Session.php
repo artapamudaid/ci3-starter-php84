@@ -299,51 +299,82 @@ class CI_Session
 	 *
 	 * @return	void
 	 */
-	protected function _configure_sid_length()
-	{
-		if (PHP_VERSION_ID < 70100) {
-			$hash_function = ini_get('session.hash_function');
-			if (ctype_digit($hash_function)) {
-				if ($hash_function !== '1') {
-					ini_set('session.hash_function', 1);
-				}
+	/**
+ * Configure session ID length for PHP 7+ and PHP 8.4 compatibility
+ */
+protected function _configure_sid_length()
+{
+    if (PHP_VERSION_ID < 70100) {
+        // Legacy PHP (<7.1) uses session.hash_function
+        $hash_function = ini_get('session.hash_function');
 
-				$bits = 160;
-			} elseif (!in_array($hash_function, hash_algos(), TRUE)) {
-				ini_set('session.hash_function', 1);
-				$bits = 160;
-			} elseif (($bits = strlen(hash($hash_function, 'dummy', false)) * 4) < 160) {
-				ini_set('session.hash_function', 1);
-				$bits = 160;
-			}
+        if (ctype_digit((string) $hash_function)) {
+            if ($hash_function !== '1') {
+                @ini_set('session.hash_function', '1');
+            }
+            $bits = 160;
+        } elseif (!in_array($hash_function, hash_algos(), true)) {
+            @ini_set('session.hash_function', '1');
+            $bits = 160;
+        } elseif (($bits = strlen(hash($hash_function, 'dummy', false)) * 4) < 160) {
+            @ini_set('session.hash_function', '1');
+            $bits = 160;
+        }
 
-			$bits_per_character = (int) ini_get('session.hash_bits_per_character');
-			$sid_length         = (int) ceil($bits / $bits_per_character);
-		} else {
-			$bits_per_character = (int) ini_get('session.sid_bits_per_character');
-			$sid_length         = (int) ini_get('session.sid_length');
-			if (($bits = $sid_length * $bits_per_character) < 160) {
-				// Add as many more characters as necessary to reach at least 160 bits
-				$sid_length += (int) ceil((160 % $bits) / $bits_per_character);
-				ini_set('session.sid_length', $sid_length);
-			}
-		}
+        $bits_per_character = (int) ini_get('session.hash_bits_per_character');
+        if ($bits_per_character <= 0) {
+            $bits_per_character = 5; // default fallback
+        }
 
-		// Yes, 4,5,6 are the only known possible values as of 2016-10-27
-		switch ($bits_per_character) {
-			case 4:
-				$this->_sid_regexp = '[0-9a-f]';
-				break;
-			case 5:
-				$this->_sid_regexp = '[0-9a-v]';
-				break;
-			case 6:
-				$this->_sid_regexp = '[0-9a-zA-Z,-]';
-				break;
-		}
+        $sid_length = (int) ceil($bits / $bits_per_character);
+    } else {
+        // PHP 7.1+ (modern)
+        $bits_per_character = (int) ini_get('session.sid_bits_per_character');
+        $sid_length         = (int) ini_get('session.sid_length');
 
-		$this->_sid_regexp .= '{' . $sid_length . '}';
-	}
+        // Handle null/false/invalid values (PHP 8.1+ stricter)
+        if ($bits_per_character <= 0) {
+            $bits_per_character = 5; // default
+        }
+        if ($sid_length <= 0) {
+            $sid_length = 26; // default
+        }
+
+        $bits = $sid_length * $bits_per_character;
+
+        // Ensure at least 160 bits entropy
+        if ($bits < 160) {
+            $needed_bits = 160 - $bits;
+            $extra_chars = (int) ceil($needed_bits / $bits_per_character);
+            $sid_length += $extra_chars;
+
+            // Avoid warning in CLI or restricted environment
+            if (function_exists('ini_set') && stripos(PHP_SAPI, 'cli') === false) {
+                @ini_set('session.sid_length', (string) $sid_length);
+            }
+        }
+    }
+
+    // Allowed bits per character values
+    switch ($bits_per_character) {
+        case 4:
+            $this->_sid_regexp = '[0-9a-f]';
+            break;
+        case 5:
+            $this->_sid_regexp = '[0-9a-v]';
+            break;
+        case 6:
+            $this->_sid_regexp = '[0-9a-zA-Z,-]';
+            break;
+        default:
+            // fallback untuk keamanan
+            $this->_sid_regexp = '[0-9a-v]';
+            break;
+    }
+
+    $this->_sid_regexp .= '{' . $sid_length . '}';
+}
+
 
 	// ------------------------------------------------------------------------
 
