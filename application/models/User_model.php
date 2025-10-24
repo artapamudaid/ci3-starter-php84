@@ -16,7 +16,14 @@ class User_model extends CI_Model {
     }
 
     public function find_by_username($username) {
-        return $this->db->where('username', $username)->get($this->table)->row();
+		$this->db->where('username', $username);
+
+		$this->db->join('user_roles ur', 'ur.user_id = users.id', 'left');
+		$this->db->join('roles r', 'r.id = ur.role_id', 'left');
+		$this->db->select('users.*, r.id as role, r.name as role_name');
+
+		$user = $this->db->get($this->table);
+        return $user->row();
     }
 
     public function verify_password($username, $password) {

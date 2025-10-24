@@ -1,26 +1,41 @@
-<div class="row justify-content-center">
-  <div class="col-md-4">
-    <div class="card shadow p-4">
-      <h4 class="mb-3 text-center">Login</h4>
-      <form id="loginForm">
-		<input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" 
-				value="<?= $this->security->get_csrf_hash(); ?>">
-
-		<div class="mb-3">
-			<label class="form-label">Username</label>
-			<input type="text" name="username" class="form-control">
-			<div class="invalid-feedback"></div>
+<div class="row align-items-center justify-content-center height-self-center">
+		<div class="col-lg-8">
+			<div class="card auth-card">
+					<div class="card-body p-0">
+						<div class="d-flex align-items-center auth-content">
+								<div class="col-lg-7 align-self-center">
+									<div class="p-3">
+											<h2 class="mb-2">Inventory App</h2>
+											<form id="loginForm">
+												<input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" 
+														value="<?= $this->security->get_csrf_hash(); ?>">
+												<div class="row">
+														<div class="col-lg-12">
+															<div class="floating-label form-group">
+																	<input class="floating-input form-control" name="username" type="text" placeholder=" ">
+																	<label>Username</label>
+															</div>
+															<div class="invalid-feedback"></div>
+														</div>
+														<div class="col-lg-12">
+															<div class="floating-label form-group">
+																	<input class="floating-input form-control" name="password" type="password" placeholder=" ">
+																	<label>Password</label>
+															</div>
+														</div>
+														<div class="invalid-feedback"></div>
+												</div>
+												<button class="btn btn-primary">Login</button>
+											</form>
+									</div>
+								</div>
+								<div class="col-lg-5 content-right">
+									<img src="<?= base_url() . 'assets/poshdash/' ?>images/login/01.png" class="img-fluid image-right" alt="" width="75%">
+								</div>
+						</div>
+					</div>
+			</div>
 		</div>
-		<div class="mb-3">
-			<label class="form-label">Password</label>
-			<input type="password" name="password" class="form-control">
-			<div class="invalid-feedback"></div>
-		</div>
-		<button class="btn btn-primary w-100">Login</button>
-		</form>
-
-    </div>
-  </div>
 </div>
 
 <script>
